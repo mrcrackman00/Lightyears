@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lightyears — find the star that lit up the day you were born</title>
+    <meta
+      name="description"
+      content="Tonight, a real star is showing you the day you were born. Enter your birthday and go find it."
+    />
+    <meta name="theme-color" content="#05060f" />
+
+    <!-- Open Graph / share preview -->
+    <meta property="og:title" content="Lightyears" />
+    <meta
+      property="og:description"
+      content="A real star's light left it the day you were born. Go find it."
+    />
+    <meta property="og:type" content="website" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,600&family=Inter:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <!-- Cheap CSS starfield (placeholder before the Phase 2 Three.js galaxy). -->
+    <div class="starfield" aria-hidden="true">
+      <div class="layer layer--far"></div>
+      <div class="layer layer--mid"></div>
+      <div class="layer layer--near"></div>
+      <div class="glow glow--one"></div>
+      <div class="glow glow--two"></div>
+    </div>
+
+    <main class="stage">
+      <!-- HERO ------------------------------------------------------------ -->
+      <section class="hero" id="hero">
+        <p class="eyebrow">A love letter from the night sky</p>
+        <h1 class="title">Lightyears</h1>
+        <p class="tagline">
+          Tonight, a star is showing you the day you were born.
+          <span class="tagline__accent">Go find it.</span>
+        </p>
+
+        <form class="finder" id="finder" novalidate>
+          <label class="finder__label" for="birthday">When were you born?</label>
+          <div class="finder__row">
+            <input
+              class="finder__input"
+              type="date"
+              id="birthday"
+              name="birthday"
+              required
+              aria-describedby="finder-hint"
+            />
+            <button class="btn-find" type="submit" id="findBtn">
+              <span class="btn-find__label">Find my star</span>
+              <span class="btn-find__spark" aria-hidden="true"></span>
+            </button>
+          </div>
+          <p class="finder__hint" id="finder-hint">
+            We turn your age into light-years and find the real star whose light
+            has been travelling exactly that long.
+          </p>
+          <p class="finder__error" id="finderError" role="alert" hidden></p>
+        </form>
+      </section>
+
+      <!-- RESULT ---------------------------------------------------------- -->
+      <section class="result" id="result" hidden>
+        <article class="card" id="card">
+          <div class="card__halo" id="cardHalo" aria-hidden="true"></div>
+
+          <p class="card__kicker">Your star is</p>
+          <h2 class="card__name" id="starName">—</h2>
+
+          <div class="card__dot-row">
+            <span class="card__dot" id="starDot" aria-hidden="true"></span>
+            <span class="card__meta" id="starMeta">—</span>
+          </div>
+
+          <p class="card__line" id="starLine">—</p>
+          <p class="card__poem" id="starPoem">—</p>
+
+          <div class="card__actions">
+            <button class="btn-ghost" type="button" id="againBtn">
+              Try another date
+            </button>
+          </div>
+        </article>
+      </section>
+
+      <footer class="footer">
+        <span>Built with real starlight from the</span>
+        <a
+          href="https://github.com/astronexus/HYG-Database"
+          target="_blank"
+          rel="noopener"
+          >HYG Database</a
+        >
+        <span>· a Stardance project</span>
+      </footer>
+    </main>
+
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>

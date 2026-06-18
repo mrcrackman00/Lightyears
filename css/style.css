@@ -1,0 +1,473 @@
+:root {
+  --bg-top: #0a0e24;
+  --bg-bottom: #03040c;
+  --ink: #eef1ff;
+  --ink-soft: #aab2d5;
+  --ink-faint: #6b7299;
+  --accent: #8ab4ff;
+  --accent-warm: #ffd9a0;
+  --card-bg: rgba(16, 20, 44, 0.62);
+  --card-border: rgba(138, 180, 255, 0.18);
+  --max: 640px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: "Inter", system-ui, sans-serif;
+  color: var(--ink);
+  background: radial-gradient(
+      120% 90% at 50% -10%,
+      #16204d 0%,
+      var(--bg-top) 38%,
+      var(--bg-bottom) 100%
+    )
+    fixed;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- Starfield (CSS placeholder) ---------------------------------- */
+.starfield {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.layer {
+  position: absolute;
+  inset: -50%;
+  background-repeat: repeat;
+}
+
+/* Each layer is a sprinkle of radial-gradient "stars" of different sizes. */
+.layer--far {
+  background-image:
+    radial-gradient(1px 1px at 20% 30%, #ffffff 50%, transparent),
+    radial-gradient(1px 1px at 70% 60%, #cdd7ff 50%, transparent),
+    radial-gradient(1px 1px at 40% 80%, #ffffff 50%, transparent),
+    radial-gradient(1px 1px at 85% 15%, #e7ecff 50%, transparent),
+    radial-gradient(1px 1px at 10% 70%, #ffffff 50%, transparent);
+  background-size: 320px 320px;
+  opacity: 0.5;
+  animation: drift 240s linear infinite, twinkle 6s ease-in-out infinite;
+}
+
+.layer--mid {
+  background-image:
+    radial-gradient(1.6px 1.6px at 50% 20%, #ffffff 50%, transparent),
+    radial-gradient(1.6px 1.6px at 15% 55%, #dfe6ff 50%, transparent),
+    radial-gradient(1.6px 1.6px at 80% 75%, #ffffff 50%, transparent),
+    radial-gradient(1.6px 1.6px at 35% 40%, #cdd7ff 50%, transparent);
+  background-size: 480px 480px;
+  opacity: 0.7;
+  animation: drift 180s linear infinite reverse, twinkle 5s ease-in-out infinite;
+}
+
+.layer--near {
+  background-image:
+    radial-gradient(2.4px 2.4px at 60% 35%, #ffffff 60%, transparent),
+    radial-gradient(2.2px 2.2px at 25% 75%, #fff4dd 60%, transparent),
+    radial-gradient(2.2px 2.2px at 90% 50%, #ffffff 60%, transparent);
+  background-size: 700px 700px;
+  opacity: 0.9;
+  animation: drift 120s linear infinite, twinkle 4s ease-in-out infinite;
+}
+
+.glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.35;
+}
+
+.glow--one {
+  width: 50vw;
+  height: 50vw;
+  top: -10vw;
+  left: -10vw;
+  background: radial-gradient(circle, #2a3a86, transparent 70%);
+}
+
+.glow--two {
+  width: 46vw;
+  height: 46vw;
+  bottom: -14vw;
+  right: -12vw;
+  background: radial-gradient(circle, #5a2d70, transparent 70%);
+  opacity: 0.28;
+}
+
+@keyframes drift {
+  to {
+    transform: translate3d(-60px, -40px, 0);
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+
+/* ---------- Stage / layout ---------------------------------------------- */
+.stage {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px 64px;
+  text-align: center;
+}
+
+/* ---------- Hero --------------------------------------------------------- */
+.hero {
+  width: 100%;
+  max-width: var(--max);
+  animation: rise 1s var(--ease) both;
+}
+
+.eyebrow {
+  margin: 0 0 14px;
+  font-size: 0.78rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.title {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(3rem, 13vw, 6rem);
+  line-height: 0.95;
+  margin: 0;
+  letter-spacing: -0.02em;
+  background: linear-gradient(180deg, #ffffff, #b9c6ff 70%, #8ab4ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 60px rgba(138, 180, 255, 0.25);
+}
+
+.tagline {
+  margin: 20px auto 0;
+  max-width: 30ch;
+  font-size: clamp(1.05rem, 3.4vw, 1.3rem);
+  line-height: 1.5;
+  color: var(--ink-soft);
+  font-weight: 300;
+}
+
+.tagline__accent {
+  display: inline-block;
+  color: var(--accent-warm);
+  font-weight: 500;
+}
+
+/* ---------- Finder form -------------------------------------------------- */
+.finder {
+  margin-top: 40px;
+}
+
+.finder__label {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+  margin-bottom: 12px;
+}
+
+.finder__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+
+.finder__input {
+  flex: 1 1 200px;
+  min-width: 160px;
+  padding: 15px 18px;
+  font-size: 1rem;
+  font-family: inherit;
+  color: var(--ink);
+  background: rgba(10, 14, 36, 0.7);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  outline: none;
+  transition: border-color 0.25s, box-shadow 0.25s;
+  color-scheme: dark;
+}
+
+.finder__input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(138, 180, 255, 0.16);
+}
+
+.btn-find {
+  position: relative;
+  flex: 0 0 auto;
+  padding: 15px 26px;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: #06122e;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  background: linear-gradient(135deg, #ffe7bd, #8ab4ff);
+  box-shadow: 0 8px 30px rgba(138, 180, 255, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+  transition: transform 0.2s var(--ease), box-shadow 0.25s, filter 0.2s;
+  overflow: hidden;
+}
+
+.btn-find:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.05);
+  box-shadow: 0 14px 40px rgba(138, 180, 255, 0.5);
+}
+
+.btn-find:active {
+  transform: translateY(0);
+}
+
+.btn-find__spark {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    120px 60px at var(--x, 50%) 50%,
+    rgba(255, 255, 255, 0.6),
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.btn-find:hover .btn-find__spark {
+  opacity: 1;
+}
+
+.finder__hint {
+  margin: 16px auto 0;
+  max-width: 38ch;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--ink-faint);
+}
+
+.finder__error {
+  margin: 12px 0 0;
+  color: #ffb4b4;
+  font-size: 0.9rem;
+}
+
+/* ---------- Result card -------------------------------------------------- */
+.result {
+  width: 100%;
+  max-width: var(--max);
+}
+
+.card {
+  position: relative;
+  padding: 40px 30px 32px;
+  border-radius: 26px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+  animation: cardIn 0.9s var(--ease) both;
+}
+
+.card__halo {
+  position: absolute;
+  top: -40%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--star-color, #fff), transparent 65%);
+  opacity: 0.22;
+  filter: blur(20px);
+  pointer-events: none;
+}
+
+.card__kicker {
+  margin: 0;
+  font-size: 0.78rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.card__name {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(2.2rem, 9vw, 3.4rem);
+  margin: 8px 0 18px;
+  line-height: 1.05;
+  color: #fff;
+  text-shadow: 0 0 40px var(--star-color, rgba(255, 255, 255, 0.4));
+}
+
+.card__dot-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.card__dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--star-color, #fff);
+  box-shadow: 0 0 16px 3px var(--star-color, #fff);
+  animation: pulse 2.6s ease-in-out infinite;
+}
+
+.card__meta {
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+  letter-spacing: 0.01em;
+}
+
+.card__line {
+  margin: 0 auto 16px;
+  max-width: 34ch;
+  font-size: clamp(1.1rem, 3.6vw, 1.35rem);
+  line-height: 1.5;
+  color: var(--ink);
+  font-weight: 300;
+}
+
+.card__line strong {
+  font-weight: 600;
+  color: var(--accent-warm);
+}
+
+.card__poem {
+  margin: 0 auto;
+  max-width: 32ch;
+  font-family: "Fraunces", Georgia, serif;
+  font-style: italic;
+  font-size: 1.02rem;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+.card__actions {
+  margin-top: 30px;
+}
+
+.btn-ghost {
+  padding: 12px 22px;
+  font-size: 0.92rem;
+  font-family: inherit;
+  color: var(--ink-soft);
+  background: transparent;
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+}
+
+.btn-ghost:hover {
+  color: #fff;
+  border-color: var(--accent);
+  background: rgba(138, 180, 255, 0.08);
+}
+
+/* ---------- Footer ------------------------------------------------------- */
+.footer {
+  margin-top: 44px;
+  font-size: 0.78rem;
+  color: var(--ink-faint);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  align-items: center;
+}
+
+.footer a {
+  color: var(--ink-soft);
+  text-decoration: none;
+  border-bottom: 1px dashed var(--ink-faint);
+}
+
+.footer a:hover {
+  color: var(--accent);
+}
+
+/* ---------- Animations --------------------------------------------------- */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translateY(28px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.25);
+    opacity: 1;
+  }
+}
+
+/* Smooth show/hide via [hidden] override for fade. */
+[hidden] {
+  display: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .layer,
+  .card__dot,
+  .hero,
+  .card {
+    animation: none !important;
+  }
+}
