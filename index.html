@@ -23,11 +23,12 @@
     <link
       href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,600&family=Inter:wght@300;400;500;600&display=swap"
       rel="stylesheet"
+      crossorigin="anonymous"
     />
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
-    <!-- Cheap CSS starfield (placeholder before the Phase 2 Three.js galaxy). -->
+    <!-- Cheap CSS starfield: hero backdrop + fallback when WebGL is unavailable. -->
     <div class="starfield" aria-hidden="true">
       <div class="layer layer--far"></div>
       <div class="layer layer--mid"></div>
@@ -35,6 +36,10 @@
       <div class="glow glow--one"></div>
       <div class="glow glow--two"></div>
     </div>
+
+    <!-- Phase 2: the real 3D galaxy (fades in on submit). -->
+    <canvas id="galaxy-canvas" class="galaxy-canvas" aria-hidden="true"></canvas>
+    <p class="galaxy-hint" id="galaxyHint" hidden>Drag to look around · scroll to zoom</p>
 
     <main class="stage">
       <!-- HERO ------------------------------------------------------------ -->
@@ -87,11 +92,98 @@
           <p class="card__poem" id="starPoem">—</p>
 
           <div class="card__actions">
+            <button class="btn-soft" type="button" id="watchBtn">
+              See who's watching →
+            </button>
+            <button class="btn-ghost" type="button" id="pinBtn">
+              Pin a message ✦
+            </button>
             <button class="btn-ghost" type="button" id="againBtn">
               Try another date
             </button>
           </div>
         </article>
+      </section>
+
+      <!-- STARPOST — pin a message + share card (Phase 4) ------------------ -->
+      <section class="starpost" id="starpost" hidden aria-label="Pin a message to your star">
+        <div class="starpost__composer" id="spComposer">
+          <label class="starpost__label" for="spMessage">
+            Pin a message to <span id="spStarLabel">your star</span>
+          </label>
+          <textarea
+            class="starpost__textarea"
+            id="spMessage"
+            maxlength="180"
+            rows="3"
+            placeholder="A note to your future self, a wish, a hello to whoever is watching…"
+          ></textarea>
+          <div class="starpost__composer-row">
+            <span class="starpost__count" id="spCount" aria-live="polite">0 / 180</span>
+            <button class="btn-soft" type="button" id="spMakeBtn">
+              Make my share card →
+            </button>
+          </div>
+        </div>
+
+        <div class="starpost__output" id="spOutput" hidden>
+          <!-- The node we rasterise to PNG. -->
+          <div class="sharecard" id="shareCard">
+            <div class="sharecard__sky" aria-hidden="true"></div>
+            <div class="sharecard__inner">
+              <p class="sharecard__brand">LIGHTYEARS</p>
+              <p class="sharecard__kicker">My star is</p>
+              <h3 class="sharecard__name" id="scName">—</h3>
+              <p class="sharecard__meta" id="scMeta">—</p>
+              <p class="sharecard__message" id="scMessage">—</p>
+              <p class="sharecard__foot">
+                The light reaching me tonight left it the day I was born.
+              </p>
+            </div>
+          </div>
+
+          <div class="starpost__actions">
+            <button class="btn-soft" type="button" id="spDownloadBtn">
+              Download PNG ↓
+            </button>
+            <button class="btn-ghost" type="button" id="spEditBtn">
+              Edit message
+            </button>
+          </div>
+          <p class="starpost__hint" id="spHint">
+            Save it, then post it anywhere — that's how others find their star too.
+          </p>
+        </div>
+      </section>
+
+      <!-- TIMELINE — "The Universe Is Watching" (Phase 3) ------------------ -->
+      <section class="timeline" id="timeline" hidden aria-label="The universe is watching">
+        <p class="timeline__eyebrow">The universe is watching</p>
+        <p class="timeline__headline" id="tlHeadline">
+          Drag through the years and watch Earth's light reach the stars.
+        </p>
+
+        <div class="timeline__sliderwrap">
+          <input
+            class="timeline__slider"
+            type="range"
+            id="tlSlider"
+            min="0"
+            max="120"
+            step="0.5"
+            value="16"
+            aria-label="Years ago"
+          />
+          <div class="timeline__scale" aria-hidden="true">
+            <span>now</span>
+            <span>30</span>
+            <span>60</span>
+            <span>90</span>
+            <span>120 yrs ago</span>
+          </div>
+        </div>
+
+        <ul class="timeline__events" id="tlEvents"></ul>
       </section>
 
       <footer class="footer">
@@ -106,6 +198,15 @@
       </footer>
     </main>
 
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/",
+          "html-to-image": "https://cdn.jsdelivr.net/npm/html-to-image@1.11.13/+esm"
+        }
+      }
+    </script>
     <script type="module" src="js/main.js"></script>
   </body>
 </html>

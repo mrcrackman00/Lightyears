@@ -7,6 +7,9 @@ import {
   colorForCi,
   starName,
 } from './stars.js';
+import { createGalaxy, webglAvailable } from './galaxy.js';
+import { createTimeline } from './timeline.js';
+import { createStarpost } from './starpost.js';
 
 const els = {
   finder: document.getElementById('finder'),
@@ -23,9 +26,38 @@ const els = {
   line: document.getElementById('starLine'),
   poem: document.getElementById('starPoem'),
   again: document.getElementById('againBtn'),
+  canvas: document.getElementById('galaxy-canvas'),
+  galaxyHint: document.getElementById('galaxyHint'),
+  watchBtn: document.getElementById('watchBtn'),
+  timeline: document.getElementById('timeline'),
+  tlHeadline: document.getElementById('tlHeadline'),
+  tlSlider: document.getElementById('tlSlider'),
+  tlEvents: document.getElementById('tlEvents'),
+  pinBtn: document.getElementById('pinBtn'),
+  starpost: document.getElementById('starpost'),
 };
 
 let starsPromise = null;
+let galaxy = null; // lazily created Three.js scene (null if WebGL unavailable)
+let galaxyReady = false;
+let timeline = null; // Phase 3 timeline controller (per result)
+let starpost = null; // Phase 4 share-card controller
+let lastResult = null; // remember the matched star for the timeline + starpost
+
+/** Create the galaxy once, on first need, if WebGL is supported. */
+function ensureGalaxy() {
+  if (galaxyReady) return galaxy;
+  galaxyReady = true;
+  if (els.canvas && webglAvailable()) {
+    try {
+      galaxy = createGalaxy(els.canvas);
+    } catch (err) {
+      console.warn('Galaxy init failed; falling back to flat view.', err);
+      galaxy = null;
+    }
+  }
+  return galaxy;
+}
 
 // A few hand-picked closing lines; rotated so repeat visits feel fresh.
 const POEMS = [
@@ -111,13 +143,26 @@ async function handleSubmit(event) {
 
     if (result.tooYoung) {
       renderTooYoung(age);
+      if (els.watchBtn) els.watchBtn.hidden = true;
+      if (els.pinBtn) els.pinBtn.hidden = true;
+      revealCard();
     } else {
       renderStar(result);
+      if (els.watchBtn) els.watchBtn.hidden = false;
+      if (els.pinBtn) els.pinBtn.hidden = false;
+      lastResult = {
+        stars,
+        star: result.star,
+        age,
+        birthday: value,
+        lightYears: result.lightYears,
+        color: colorForCi(result.star.ci),
+        name: starName(result.star),
+        con: result.star.con || '',
+      };
+      await flyToStar(stars, result.star);
+      revealCard();
     }
-
-    els.hero.hidden = true;
-    els.result.hidden = false;
-    els.result.scrollIntoView({ behavior: 'smooth', block: 'center' });
   } catch (err) {
     showError(
       'Could not load the stars. If you opened this as a file, run it through a local server (npx serve .) instead.'
@@ -129,10 +174,127 @@ async function handleSubmit(event) {
   }
 }
 
+/**
+ * Build the galaxy (once), reveal it, highlight the user's star, and fly the
+ * camera there. Resolves when the flight is done so the card can fade in after.
+ */
+async function flyToStar(stars, star) {
+  const g = ensureGalaxy();
+  if (!g) {
+    // No WebGL: keep the flat experience; the timeline needs the 3D shell.
+    if (els.watchBtn) els.watchBtn.hidden = true;
+    return;
+  }
+
+  g.buildField(stars);
+  g.reveal();
+  if (els.galaxyHint) els.galaxyHint.hidden = false;
+  g.highlight(star);
+  document.body.classList.add('galaxy-active');
+  await g.flyTo(star);
+}
+
+function revealCard() {
+  els.hero.hidden = true;
+  els.result.hidden = false;
+}
+
+/**
+ * Open the Phase 3 timeline: build the controller once per result, frame the
+ * shell, and start on the user's own age (their birthday shell).
+ */
+async function handleWatch() {
+  if (!lastResult) return;
+  const g = galaxy;
+
+  // Build/refresh the timeline controller for this result.
+  if (timeline) timeline.destroy();
+  const birthYear = new Date(lastResult.birthday).getFullYear();
+  timeline = createTimeline({
+    galaxy: g,
+    stars: lastResult.stars,
+    els: {
+      headline: els.tlHeadline,
+      slider: els.tlSlider,
+      events: els.tlEvents,
+    },
+    birthYear,
+  });
+
+  els.timeline.hidden = false;
+  els.watchBtn.hidden = true;
+  document.body.classList.add('timeline-active');
+
+  // Start the slider at the user's age so it opens on "their" shell.
+  const startYearsAgo = Math.min(120, Math.max(0, Math.round(lastResult.age)));
+  if (g && g.frameShell) {
+    g.frameShell(startYearsAgo || 16);
+  }
+  timeline.setYearsAgo(startYearsAgo);
+}
+
+function closeTimeline() {
+  if (timeline) {
+    timeline.destroy();
+    timeline = null;
+  }
+  if (els.timeline) els.timeline.hidden = true;
+  document.body.classList.remove('timeline-active');
+  if (galaxy && galaxy.hideShell) galaxy.hideShell();
+}
+
+/** Open the Phase 4 starpost composer for the matched star. */
+function handlePin() {
+  if (!lastResult) return;
+  if (!starpost) {
+    starpost = createStarpost({
+      els: {
+        panel: els.starpost,
+        composer: document.getElementById('spComposer'),
+        output: document.getElementById('spOutput'),
+        starLabel: document.getElementById('spStarLabel'),
+        message: document.getElementById('spMessage'),
+        count: document.getElementById('spCount'),
+        makeBtn: document.getElementById('spMakeBtn'),
+        card: document.getElementById('shareCard'),
+        scName: document.getElementById('scName'),
+        scMeta: document.getElementById('scMeta'),
+        scMessage: document.getElementById('scMessage'),
+        downloadBtn: document.getElementById('spDownloadBtn'),
+        editBtn: document.getElementById('spEditBtn'),
+        hint: document.getElementById('spHint'),
+      },
+    });
+  }
+  document.body.classList.add('starpost-active');
+  starpost.open({
+    name: lastResult.name,
+    lightYears: lastResult.lightYears,
+    color: lastResult.color,
+    con: lastResult.con,
+  });
+}
+
+function closeStarpost() {
+  if (starpost) starpost.close();
+  if (els.starpost) els.starpost.hidden = true;
+  document.body.classList.remove('starpost-active');
+}
+
 function handleAgain() {
   els.result.hidden = true;
   els.hero.hidden = false;
-  els.hero.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  closeTimeline();
+  closeStarpost();
+  document.body.classList.remove('galaxy-active');
+  if (els.galaxyHint) els.galaxyHint.hidden = true;
+  lastResult = null;
+  if (galaxy) {
+    galaxy.reset();
+    galaxy.hide();
+  } else {
+    els.hero.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
   els.birthday.focus();
 }
 
@@ -140,6 +302,8 @@ function init() {
   setMaxDateToday();
   els.finder.addEventListener('submit', handleSubmit);
   els.again.addEventListener('click', handleAgain);
+  if (els.watchBtn) els.watchBtn.addEventListener('click', handleWatch);
+  if (els.pinBtn) els.pinBtn.addEventListener('click', handlePin);
 
   // Warm the data load as soon as the page is idle.
   if ('requestIdleCallback' in window) {

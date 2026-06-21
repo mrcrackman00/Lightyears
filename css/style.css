@@ -127,10 +127,54 @@ body {
   }
 }
 
+/* ---------- 3D galaxy canvas (Phase 2) ----------------------------------- */
+.galaxy-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  display: block;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1.2s ease;
+}
+
+.galaxy-canvas.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* When the galaxy is active, fade out the cheap CSS starfield behind it. */
+.galaxy-active .starfield {
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+
+.galaxy-hint {
+  position: fixed;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  margin: 0;
+  padding: 8px 16px;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+  background: rgba(8, 11, 30, 0.5);
+  border: 1px solid var(--card-border);
+  border-radius: 999px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  pointer-events: none;
+  animation: rise 1.2s var(--ease) both;
+}
+
 /* ---------- Stage / layout ---------------------------------------------- */
 .stage {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -138,6 +182,40 @@ body {
   justify-content: center;
   padding: 32px 20px 64px;
   text-align: center;
+}
+
+/* With the galaxy active, let the 3D scene receive drag/zoom: the stage
+   stops intercepting pointer events except on the interactive card + footer. */
+.galaxy-active .stage {
+  pointer-events: none;
+}
+
+.galaxy-active .card,
+.galaxy-active .footer,
+.galaxy-active .timeline,
+.galaxy-active .starpost {
+  pointer-events: auto;
+}
+
+/* The result card becomes a translucent overlay so the galaxy shows through. */
+.galaxy-active .stage {
+  justify-content: flex-end;
+}
+
+.galaxy-active .result {
+  margin-bottom: 8px;
+}
+
+@media (min-width: 760px) {
+  .galaxy-active .stage {
+    align-items: flex-start;
+    justify-content: center;
+    padding-left: 4vw;
+  }
+  .galaxy-active .result {
+    margin-bottom: 0;
+    text-align: left;
+  }
 }
 
 /* ---------- Hero --------------------------------------------------------- */
@@ -381,6 +459,34 @@ body {
 
 .card__actions {
   margin-top: 30px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+
+.galaxy-active .card__actions {
+  justify-content: flex-start;
+}
+
+.btn-soft {
+  padding: 12px 22px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: #06122e;
+  background: linear-gradient(135deg, #ffe7bd, #8ab4ff);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 6px 22px rgba(138, 180, 255, 0.3);
+  transition: transform 0.2s var(--ease), box-shadow 0.25s, filter 0.2s;
+}
+
+.btn-soft:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.05);
+  box-shadow: 0 10px 30px rgba(138, 180, 255, 0.45);
 }
 
 .btn-ghost {
@@ -399,6 +505,358 @@ body {
   color: #fff;
   border-color: var(--accent);
   background: rgba(138, 180, 255, 0.08);
+}
+
+/* ---------- Timeline — "The Universe Is Watching" (Phase 3) -------------- */
+.timeline {
+  width: 100%;
+  max-width: var(--max);
+  margin-top: 18px;
+  padding: 22px 24px 24px;
+  border-radius: 22px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  animation: cardIn 0.7s var(--ease) both;
+}
+
+.timeline__eyebrow {
+  margin: 0 0 8px;
+  font-size: 0.7rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.timeline__headline {
+  margin: 0 0 20px;
+  font-size: clamp(1rem, 3.2vw, 1.18rem);
+  line-height: 1.5;
+  color: var(--ink);
+  font-weight: 300;
+  min-height: 3.2em;
+}
+
+.timeline__headline strong {
+  font-weight: 600;
+  color: var(--accent-warm);
+}
+
+.timeline__sliderwrap {
+  margin: 0 auto 18px;
+  max-width: 520px;
+}
+
+.timeline__slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 231, 189, 0.9),
+    rgba(138, 180, 255, 0.9)
+  );
+  outline: none;
+  cursor: pointer;
+}
+
+.timeline__slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid var(--accent-warm);
+  box-shadow: 0 0 14px 3px rgba(255, 217, 160, 0.7);
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.timeline__slider::-webkit-slider-thumb:hover {
+  transform: scale(1.12);
+}
+
+.timeline__slider::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid var(--accent-warm);
+  box-shadow: 0 0 14px 3px rgba(255, 217, 160, 0.7);
+  cursor: pointer;
+}
+
+.timeline__slider:focus-visible {
+  box-shadow: 0 0 0 4px rgba(138, 180, 255, 0.25);
+}
+
+.timeline__scale {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 0.7rem;
+  color: var(--ink-faint);
+}
+
+.timeline__events {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.tl-chip {
+  padding: 7px 12px;
+  font-size: 0.8rem;
+  font-family: inherit;
+  color: var(--ink-soft);
+  background: rgba(10, 14, 36, 0.6);
+  border: 1px solid var(--card-border);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s, background 0.2s, transform 0.15s;
+}
+
+.tl-chip:hover {
+  color: #fff;
+  border-color: var(--accent);
+  background: rgba(138, 180, 255, 0.12);
+  transform: translateY(-1px);
+}
+
+.tl-chip__emoji {
+  margin-right: 2px;
+}
+
+.tl-chip--you {
+  color: #06122e;
+  background: linear-gradient(135deg, #ffe7bd, #ffd9a0);
+  border-color: transparent;
+  font-weight: 600;
+}
+
+.tl-chip--you:hover {
+  color: #06122e;
+  background: linear-gradient(135deg, #fff0d6, #ffe2b4);
+}
+
+/* When the timeline is open, keep it interactive above the canvas. */
+.timeline-active .timeline {
+  pointer-events: auto;
+}
+
+@media (min-width: 760px) {
+  .timeline-active .stage {
+    align-items: flex-start;
+  }
+}
+
+/* ---------- Starpost — pin a message + share card (Phase 4) ------------- */
+.starpost {
+  width: 100%;
+  max-width: var(--max);
+  margin-top: 18px;
+  animation: cardIn 0.7s var(--ease) both;
+}
+
+.starpost__composer,
+.starpost__output {
+  padding: 22px 24px 24px;
+  border-radius: 22px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.5);
+}
+
+.starpost__label {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+}
+
+.starpost__label span {
+  color: var(--accent-warm);
+  font-weight: 600;
+}
+
+.starpost__textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 76px;
+  padding: 14px 16px;
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--ink);
+  background: rgba(8, 11, 28, 0.7);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.starpost__textarea::placeholder {
+  color: var(--ink-faint);
+}
+
+.starpost__textarea:focus-visible {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(138, 180, 255, 0.18);
+}
+
+.starpost__composer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.starpost__count {
+  font-size: 0.78rem;
+  color: var(--ink-faint);
+}
+
+/* --- the share card we rasterise to PNG --- */
+.starpost__output {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.sharecard {
+  --star-color: #ffd9a0;
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  aspect-ratio: 4 / 5;
+  border-radius: 22px;
+  overflow: hidden;
+  background:
+    radial-gradient(130% 80% at 50% -10%, #1a2657 0%, #0a0e24 45%, #05060f 100%);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6);
+}
+
+.sharecard__sky {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1.5px 1.5px at 18% 22%, #ffffff, transparent),
+    radial-gradient(1px 1px at 70% 16%, #cdd7ff, transparent),
+    radial-gradient(1.5px 1.5px at 82% 64%, #ffffff, transparent),
+    radial-gradient(1px 1px at 33% 78%, #bcd0ff, transparent),
+    radial-gradient(1px 1px at 52% 44%, #ffffff, transparent),
+    radial-gradient(1.5px 1.5px at 12% 60%, #ffe7bd, transparent),
+    radial-gradient(1px 1px at 90% 38%, #ffffff, transparent),
+    radial-gradient(1px 1px at 60% 88%, #cdd7ff, transparent);
+  opacity: 0.85;
+}
+
+/* The star itself: a soft glowing orb in the star's colour. */
+.sharecard__sky::after {
+  content: "";
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  width: 14px;
+  height: 14px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: var(--star-color);
+  box-shadow:
+    0 0 18px 6px var(--star-color),
+    0 0 48px 18px color-mix(in srgb, var(--star-color) 45%, transparent);
+}
+
+.sharecard__inner {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 28px 26px 26px;
+  text-align: center;
+}
+
+.sharecard__brand {
+  position: absolute;
+  top: 22px;
+  left: 0;
+  right: 0;
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.42em;
+  color: var(--ink-soft);
+}
+
+.sharecard__kicker {
+  margin: 0 0 4px;
+  font-size: 0.74rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.sharecard__name {
+  margin: 0 0 8px;
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(1.9rem, 8vw, 2.6rem);
+  line-height: 1.05;
+  color: #fff;
+}
+
+.sharecard__meta {
+  margin: 0 0 16px;
+  font-size: 0.86rem;
+  color: var(--accent);
+}
+
+.sharecard__message {
+  margin: 0 0 16px;
+  font-family: "Fraunces", Georgia, serif;
+  font-style: italic;
+  font-size: clamp(1rem, 4.4vw, 1.2rem);
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+.sharecard__foot {
+  margin: 0;
+  font-size: 0.74rem;
+  line-height: 1.4;
+  color: var(--ink-faint);
+}
+
+.starpost__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.starpost__hint {
+  margin: 14px 0 0;
+  font-size: 0.8rem;
+  color: var(--ink-faint);
+  text-align: center;
+}
+
+.galaxy-active .starpost__output {
+  align-items: center;
 }
 
 /* ---------- Footer ------------------------------------------------------- */
