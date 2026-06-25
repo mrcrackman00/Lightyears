@@ -261,6 +261,8 @@ function handlePin() {
         scMeta: document.getElementById('scMeta'),
         scMessage: document.getElementById('scMessage'),
         downloadBtn: document.getElementById('spDownloadBtn'),
+        whatsAppBtn: document.getElementById('spWhatsAppBtn'),
+        twitterBtn: document.getElementById('spTwitterBtn'),
         editBtn: document.getElementById('spEditBtn'),
         hint: document.getElementById('spHint'),
       },

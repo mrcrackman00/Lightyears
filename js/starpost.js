@@ -11,6 +11,7 @@
 
 const STORE_PREFIX = 'lightyears:note:';
 const MAX_LEN = 180;
+const DEMO_URL = 'https://mrcrackman00.github.io/Lightyears/';
 
 function storeKey(starName) {
   return STORE_PREFIX + String(starName).trim().toLowerCase();
@@ -109,6 +110,50 @@ export function createStarpost({ els }) {
     if (els.hint) els.hint.hidden = false;
   }
 
+  /** Text + URL for WhatsApp / X share intents. */
+  function buildSharePayload() {
+    if (!current) return null;
+    const msg = els.message.value.trim();
+    let text = `My star is ${current.name} — ${current.lightYears.toFixed(1)} light-years away.`;
+    if (msg) text += ` “${msg}”`;
+    text +=
+      ' The light reaching me tonight left it the day I was born. Find yours:';
+    return { text, url: DEMO_URL };
+  }
+
+  function shareWhatsApp() {
+    const payload = buildSharePayload();
+    if (!payload) return;
+    const full = `${payload.text} ${payload.url}`;
+    window.open(
+      `https://wa.me/?text=${encodeURIComponent(full)}`,
+      '_blank',
+      'noopener,noreferrer'
+    );
+    if (els.hint) {
+      els.hint.textContent =
+        'Opening WhatsApp — send it to a friend so they find their star too.';
+    }
+  }
+
+  function shareTwitter() {
+    const payload = buildSharePayload();
+    if (!payload) return;
+    const params = new URLSearchParams({
+      text: payload.text,
+      url: payload.url,
+    });
+    window.open(
+      `https://twitter.com/intent/tweet?${params}`,
+      '_blank',
+      'noopener,noreferrer'
+    );
+    if (els.hint) {
+      els.hint.textContent =
+        'Opening X — post it so others can find their star too.';
+    }
+  }
+
   async function download() {
     if (busy || !current) return;
     busy = true;
@@ -156,12 +201,18 @@ export function createStarpost({ els }) {
   els.message.addEventListener('input', onInput);
   els.makeBtn.addEventListener('click', makeCard);
   els.downloadBtn.addEventListener('click', download);
+  if (els.whatsAppBtn) els.whatsAppBtn.addEventListener('click', shareWhatsApp);
+  if (els.twitterBtn) els.twitterBtn.addEventListener('click', shareTwitter);
   if (els.editBtn) els.editBtn.addEventListener('click', showComposer);
 
   function destroy() {
     els.message.removeEventListener('input', onInput);
     els.makeBtn.removeEventListener('click', makeCard);
     els.downloadBtn.removeEventListener('click', download);
+    if (els.whatsAppBtn)
+      els.whatsAppBtn.removeEventListener('click', shareWhatsApp);
+    if (els.twitterBtn)
+      els.twitterBtn.removeEventListener('click', shareTwitter);
     if (els.editBtn) els.editBtn.removeEventListener('click', showComposer);
   }
 
