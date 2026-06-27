@@ -1,98 +1,103 @@
 # Lightyears
 
-> Tonight, a real star is showing you the day you were born. Go find it.
+A tiny website that finds the real star whose light left it on the day you were
+born — then flies you to it through a 3D galaxy of 8,800 real stars.
 
-**[▶ Live demo](https://mrcrackman00.github.io/Lightyears/)**
+![Lightyears: the universe-is-watching timeline open on the Moon-landing shell](assets/timeline-universe-watching.png)
 
-Enter your birthday and Lightyears finds a **real star** whose light has been
-travelling toward Earth for about as long as you've been alive. A star ~16
-light-years away is, *right now*, shining light into your eyes that left it
-~16 years ago — so the light you see tonight left that star on the day you
-were born.
+## Try it
 
-Built as a [Hack Club Stardance](https://stardance.hackclub.com/) project.
+**→ [lightyears live demo](https://mrcrackman00.github.io/Lightyears/)**
 
----
+Type a birthday, press *Find my star*. That's the whole thing — no sign-up, no install.
 
-## ✨ Features
+## The idea
 
-- **Find your star** — your age in years becomes a distance in light-years, and
-  the app picks the real star sitting closest to that distance (from a catalog
-  of 8,800+ real stars), preferring named/bright ones so the result feels special.
-- **3D galaxy** — the result isn't a flat card; it's a live [Three.js](https://threejs.org/)
-  starfield of ~8,800 real stars, placed by their actual coordinates and coloured
-  by temperature. The camera flies to *your* star, which glows with a pulsing ring.
-  Drag to look around, scroll to zoom.
-- **The universe is watching** — drag a timeline through Earth's history and the
-  galaxy lights up the *shell of stars* at that exact distance. A star 57 light-years
-  away is catching Earth's light from 1969 **right now** — so someone there, with a
-  telescope, would be watching the Moon landing live. Real events (and your own
-  birthday) are pinned on the timeline.
-- **Starposts & share cards** — pin a message to your star (saved locally, per star),
-  then download a beautiful share-card PNG or share directly to **WhatsApp** and **X**
-  with one tap.
+Light is slow. A star 25 light-years away is showing you light that left it 25
+years ago. So if you're 25, there is a real, named star out there whose light is
+reaching your eyes *tonight* having left on the day you were born. Lightyears
+turns your age into a distance, reaches into a catalog of real stars, and hands
+you yours.
 
-## 📷 Screenshots
+It's a small piece of perspective dressed up as a toy.
 
-| The universe is watching | Share card |
-| --- | --- |
-| ![Timeline open on the Moon-landing shell](assets/timeline-universe-watching.png) | ![A Lightyears share card](assets/starpost-share-card.png) |
+## What it does
 
-## 🚀 Run it locally
+- **Finds your star.** Your age in years becomes a distance in light-years, and
+  the app picks the real star closest to that distance from a catalog of 8,800+
+  stars — leaning toward named and bright ones so your result feels like *yours*.
+- **Flies you there.** The result isn't a flat card. The whole galaxy renders in
+  3D (every star placed by its true coordinates, coloured by its real
+  temperature) and the camera flies to your star, which pulses with a glowing
+  ring. Drag to look around, scroll to zoom.
+- **Shows who's watching.** Drag the *Universe Is Watching* timeline and the
+  galaxy lights up the shell of stars at that exact distance. Stars 57 light-years
+  out are receiving Earth's light from 1969 right now — so someone there, with a
+  good enough telescope, is watching the Moon landing live. Real events and your
+  own birthday are pinned along the slider.
+- **Lets you leave a note.** Pin a message to your star (saved on your device,
+  per star), then export a share-card PNG or post straight to WhatsApp or X.
 
-This is a plain static site (HTML + CSS + JS, no build step), but it loads star
-data and uses ES modules, so it must be served over HTTP — not opened as a
-`file://` page.
+## Run it locally
+
+It's a plain static site — HTML, CSS, and vanilla JS modules, no build step. But
+it fetches the star catalog and uses ES modules, so it has to be served over HTTP
+(opening `index.html` as a `file://` page won't work).
+
+Any static server works. With Node 18+ installed:
 
 ```bash
 npx serve .
 ```
 
-Then open the printed URL (e.g. http://localhost:3000) and enter a birthday.
+Open the URL it prints (e.g. `http://localhost:3000`) and enter a birthday.
 
-## 🔭 How it works
-
-- `data/stars.json` is a trimmed copy of the HYG star catalog (~8.8k stars).
-- Your age in years is matched to the star whose distance in **light-years**
-  (`distance_in_parsecs × 3.262`) is closest to your age, preferring named or
-  bright stars so the result feels special.
-- Star colour comes from each star's B-V colour index (`ci`).
-- The 3D galaxy uses a custom shader so brightening a "shell" of ~8,800 stars
-  while you drag the timeline is just a uniform update — no geometry rebuilds,
-  so it stays smooth.
-- Everything is progressive enhancement: no WebGL? The flat "find your star"
-  experience still works.
-
-Rebuild the star data anytime:
+To regenerate `data/stars.json` from the source HYG catalog:
 
 ```bash
 node data/build-stars.js
 ```
 
-See [data/build-data.md](data/build-data.md) for details.
+Details on that step live in [data/build-data.md](data/build-data.md).
 
-## 🛠️ Tech
+## How it works (the one interesting bit)
 
-- Plain HTML / CSS / JavaScript (ES modules) — no framework, no build step
-- [Three.js](https://threejs.org/) (via CDN) for the 3D galaxy
-- [html-to-image](https://github.com/bubkoo/html-to-image) (via CDN) for share-card PNGs
+The trick that makes the timeline feel alive is that **nothing rebuilds when you
+drag it.**
+
+All 8,800 stars live in a single Three.js point cloud, and each star's distance
+is baked into a vertex attribute. The "shell of stars catching Earth's light from
+year X" is computed entirely on the GPU: a custom shader brightens any star whose
+distance falls within a thin band around the slider value. Dragging the timeline
+just updates one uniform — no geometry is touched, no points are re-uploaded — so
+scrubbing through a century of history stays smooth even on a phone.
+
+The whole experience is built as progressive enhancement, too. No WebGL? The flat
+"find your star" card still works on its own, backed by a pure-CSS starfield.
+
+## Built with
+
+- Vanilla HTML / CSS / JavaScript (ES modules) — no framework
+- [Three.js](https://threejs.org/) for the 3D galaxy
+- [html-to-image](https://github.com/bubkoo/html-to-image) for the share-card PNGs
 - Hosted on GitHub Pages
 
-## 📂 Project structure
+## Where things live
 
 ```
-index.html         — page markup + CDN import map
-css/style.css      — all styling
-js/main.js         — UI wiring & orchestration
-js/stars.js        — star data + age→light-years logic
-js/galaxy.js       — Three.js 3D galaxy
-js/timeline.js     — "the universe is watching" timeline
-js/starpost.js     — pin a message + share-card PNG
-data/              — HYG catalog build script + stars.json
+index.html        page markup + CDN import map
+css/style.css     the observatory-chart theme
+js/main.js        UI wiring & orchestration
+js/stars.js       star data + age → light-years matching
+js/galaxy.js      Three.js galaxy + fly-to camera
+js/timeline.js    the "universe is watching" shell shader
+js/starpost.js    pin a message + render the share card
+data/             HYG catalog build script + stars.json
 ```
 
-## 📜 Credits & license
+## Credits
 
-- Star data: **HYG Database** by astronexus — licensed
-  [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
-- This project's code: **MIT** (see [LICENSE](LICENSE)).
+- Star positions, colours, and distances come from the **HYG Database** by
+  astronexus, used under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+- Made for [Hack Club Stardance](https://stardance.hackclub.com/).
+- This project's own code is **MIT** — see [LICENSE](LICENSE).

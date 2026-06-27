@@ -1,15 +1,40 @@
+/* =========================================================================
+   Lightyears — "observatory logbook" theme
+   A star-chart / instrument-panel look: deep ink, an amber lamp accent,
+   hairline plates with corner reticles, and monospace catalog readouts.
+   ========================================================================= */
+
 :root {
-  --bg-top: #0a0e24;
-  --bg-bottom: #03040c;
-  --ink: #eef1ff;
-  --ink-soft: #aab2d5;
-  --ink-faint: #6b7299;
-  --accent: #8ab4ff;
-  --accent-warm: #ffd9a0;
-  --card-bg: rgba(16, 20, 44, 0.62);
-  --card-border: rgba(138, 180, 255, 0.18);
-  --max: 640px;
-  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  /* Ink — cold deep night, almost black, with a faint blue cast. */
+  --ink-900: #05060c;
+  --ink-800: #080a14;
+  --ink-700: #0c0f1d;
+  --ink-600: #121627;
+
+  /* Text */
+  --text: #e8e9f2;
+  --text-soft: #9aa0bd;
+  --text-faint: #5a607e;
+
+  /* Accent — a warm observatory lamp amber, the signature colour. */
+  --amber: #ffb347;
+  --amber-soft: #ffd9a0;
+  --amber-deep: #c8791f;
+
+  /* A cold counter-accent used sparingly for "starlight". */
+  --cold: #93b8ff;
+
+  /* Plate (the chart panels) — flat, hairline-bordered, barely-there fill. */
+  --plate: rgba(12, 15, 29, 0.72);
+  --line: rgba(255, 179, 71, 0.22);
+  --line-soft: rgba(154, 160, 189, 0.16);
+
+  --max: 660px;
+  --ease: cubic-bezier(0.2, 0.9, 0.25, 1);
+
+  --serif: "Fraunces", Georgia, "Times New Roman", serif;
+  --sans: "Inter", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
 }
 
 * {
@@ -24,21 +49,36 @@ body {
 }
 
 body {
-  font-family: "Inter", system-ui, sans-serif;
-  color: var(--ink);
-  background: radial-gradient(
-      120% 90% at 50% -10%,
-      #16204d 0%,
-      var(--bg-top) 38%,
-      var(--bg-bottom) 100%
-    )
-    fixed;
+  font-family: var(--sans);
+  color: var(--text);
+  background-color: var(--ink-900);
+  background-image:
+    radial-gradient(120% 80% at 50% -20%, #11162e 0%, var(--ink-800) 40%, var(--ink-900) 100%);
+  background-attachment: fixed;
   min-height: 100vh;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
 
-/* ---------- Starfield (CSS placeholder) ---------------------------------- */
+/* A faint scanline/paper grain over everything — the "instrument" texture. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 0.5) 0,
+    rgba(255, 255, 255, 0.5) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  mix-blend-mode: overlay;
+}
+
+/* ---------- Starfield (CSS placeholder / WebGL fallback) ---------------- */
 .starfield {
   position: fixed;
   inset: 0;
@@ -53,7 +93,6 @@ body {
   background-repeat: repeat;
 }
 
-/* Each layer is a sprinkle of radial-gradient "stars" of different sizes. */
 .layer--far {
   background-image:
     radial-gradient(1px 1px at 20% 30%, #ffffff 50%, transparent),
@@ -62,7 +101,7 @@ body {
     radial-gradient(1px 1px at 85% 15%, #e7ecff 50%, transparent),
     radial-gradient(1px 1px at 10% 70%, #ffffff 50%, transparent);
   background-size: 320px 320px;
-  opacity: 0.5;
+  opacity: 0.45;
   animation: drift 240s linear infinite, twinkle 6s ease-in-out infinite;
 }
 
@@ -73,42 +112,41 @@ body {
     radial-gradient(1.6px 1.6px at 80% 75%, #ffffff 50%, transparent),
     radial-gradient(1.6px 1.6px at 35% 40%, #cdd7ff 50%, transparent);
   background-size: 480px 480px;
-  opacity: 0.7;
+  opacity: 0.65;
   animation: drift 180s linear infinite reverse, twinkle 5s ease-in-out infinite;
 }
 
 .layer--near {
   background-image:
-    radial-gradient(2.4px 2.4px at 60% 35%, #ffffff 60%, transparent),
-    radial-gradient(2.2px 2.2px at 25% 75%, #fff4dd 60%, transparent),
-    radial-gradient(2.2px 2.2px at 90% 50%, #ffffff 60%, transparent);
+    radial-gradient(2.2px 2.2px at 60% 35%, #ffffff 60%, transparent),
+    radial-gradient(2px 2px at 25% 75%, var(--amber-soft) 60%, transparent),
+    radial-gradient(2px 2px at 90% 50%, #ffffff 60%, transparent);
   background-size: 700px 700px;
-  opacity: 0.9;
+  opacity: 0.85;
   animation: drift 120s linear infinite, twinkle 4s ease-in-out infinite;
 }
 
+/* The signature backdrop: two faint amber/cold "lamp" washes, low and warm. */
 .glow {
   position: absolute;
   border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.35;
+  filter: blur(90px);
 }
 
 .glow--one {
-  width: 50vw;
-  height: 50vw;
-  top: -10vw;
-  left: -10vw;
-  background: radial-gradient(circle, #2a3a86, transparent 70%);
+  width: 52vw;
+  height: 52vw;
+  top: -14vw;
+  left: -12vw;
+  background: radial-gradient(circle, rgba(255, 179, 71, 0.16), transparent 70%);
 }
 
 .glow--two {
   width: 46vw;
   height: 46vw;
-  bottom: -14vw;
-  right: -12vw;
-  background: radial-gradient(circle, #5a2d70, transparent 70%);
-  opacity: 0.28;
+  bottom: -16vw;
+  right: -14vw;
+  background: radial-gradient(circle, rgba(147, 184, 255, 0.12), transparent 70%);
 }
 
 @keyframes drift {
@@ -118,16 +156,11 @@ body {
 }
 
 @keyframes twinkle {
-  0%,
-  100% {
-    opacity: 0.4;
-  }
-  50% {
-    opacity: 0.95;
-  }
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.9; }
 }
 
-/* ---------- 3D galaxy canvas (Phase 2) ----------------------------------- */
+/* ---------- 3D galaxy canvas -------------------------------------------- */
 .galaxy-canvas {
   position: fixed;
   inset: 0;
@@ -145,7 +178,6 @@ body {
   pointer-events: auto;
 }
 
-/* When the galaxy is active, fade out the cheap CSS starfield behind it. */
 .galaxy-active .starfield {
   opacity: 0;
   transition: opacity 1.2s ease;
@@ -158,15 +190,17 @@ body {
   transform: translateX(-50%);
   z-index: 3;
   margin: 0;
-  padding: 8px 16px;
-  font-size: 0.78rem;
-  letter-spacing: 0.04em;
-  color: var(--ink-soft);
-  background: rgba(8, 11, 30, 0.5);
-  border: 1px solid var(--card-border);
-  border-radius: 999px;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  padding: 7px 16px;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  background: rgba(8, 10, 20, 0.6);
+  border: 1px solid var(--line-soft);
+  border-radius: 2px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   pointer-events: none;
   animation: rise 1.2s var(--ease) both;
 }
@@ -180,14 +214,13 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 32px 20px 64px;
-  text-align: center;
+  padding: 40px 22px 72px;
+  text-align: left;
 }
 
-/* With the galaxy active, let the 3D scene receive drag/zoom: the stage
-   stops intercepting pointer events except on the interactive card + footer. */
 .galaxy-active .stage {
   pointer-events: none;
+  justify-content: flex-end;
 }
 
 .galaxy-active .card,
@@ -195,11 +228,6 @@ body {
 .galaxy-active .timeline,
 .galaxy-active .starpost {
   pointer-events: auto;
-}
-
-/* The result card becomes a translucent overlay so the galaxy shows through. */
-.galaxy-active .stage {
-  justify-content: flex-end;
 }
 
 .galaxy-active .result {
@@ -210,11 +238,10 @@ body {
   .galaxy-active .stage {
     align-items: flex-start;
     justify-content: center;
-    padding-left: 4vw;
+    padding-left: 5vw;
   }
   .galaxy-active .result {
     margin-bottom: 0;
-    text-align: left;
   }
 }
 
@@ -225,104 +252,126 @@ body {
   animation: rise 1s var(--ease) both;
 }
 
+/* The eyebrow reads like a catalog header line. */
 .eyebrow {
-  margin: 0 0 14px;
-  font-size: 0.78rem;
-  letter-spacing: 0.32em;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 22px;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--ink-faint);
+  color: var(--text-faint);
+}
+
+.eyebrow::before {
+  content: "";
+  width: 26px;
+  height: 1px;
+  background: var(--amber);
 }
 
 .title {
-  font-family: "Fraunces", Georgia, serif;
-  font-weight: 400;
-  font-size: clamp(3rem, 13vw, 6rem);
-  line-height: 0.95;
+  font-family: var(--serif);
+  font-weight: 300;
+  font-size: clamp(3.2rem, 14vw, 6.5rem);
+  line-height: 0.92;
   margin: 0;
-  letter-spacing: -0.02em;
-  background: linear-gradient(180deg, #ffffff, #b9c6ff 70%, #8ab4ff);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  text-shadow: 0 0 60px rgba(138, 180, 255, 0.25);
+  letter-spacing: -0.025em;
+  color: var(--text);
+}
+
+/* The amber underline tick under the wordmark — chart annotation feel. */
+.title::after {
+  content: "";
+  display: block;
+  width: 64px;
+  height: 2px;
+  margin-top: 18px;
+  background: var(--amber);
+  box-shadow: 0 0 16px rgba(255, 179, 71, 0.6);
 }
 
 .tagline {
-  margin: 20px auto 0;
-  max-width: 30ch;
-  font-size: clamp(1.05rem, 3.4vw, 1.3rem);
-  line-height: 1.5;
-  color: var(--ink-soft);
+  margin: 26px 0 0;
+  max-width: 34ch;
+  font-size: clamp(1.05rem, 3.2vw, 1.28rem);
+  line-height: 1.55;
+  color: var(--text-soft);
   font-weight: 300;
 }
 
 .tagline__accent {
-  display: inline-block;
-  color: var(--accent-warm);
+  display: inline;
+  color: var(--amber-soft);
   font-weight: 500;
 }
 
 /* ---------- Finder form -------------------------------------------------- */
 .finder {
-  margin-top: 40px;
+  margin-top: 44px;
 }
 
 .finder__label {
   display: block;
-  font-size: 0.95rem;
-  color: var(--ink-soft);
-  margin-bottom: 12px;
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  margin-bottom: 14px;
 }
 
 .finder__row {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  justify-content: center;
+  gap: 10px;
 }
 
 .finder__input {
   flex: 1 1 200px;
   min-width: 160px;
-  padding: 15px 18px;
+  padding: 16px 18px;
   font-size: 1rem;
-  font-family: inherit;
-  color: var(--ink);
-  background: rgba(10, 14, 36, 0.7);
-  border: 1px solid var(--card-border);
-  border-radius: 14px;
+  font-family: var(--mono);
+  color: var(--text);
+  background: var(--ink-700);
+  border: 1px solid var(--line-soft);
+  border-radius: 3px;
   outline: none;
-  transition: border-color 0.25s, box-shadow 0.25s;
+  transition: border-color 0.22s, box-shadow 0.22s;
   color-scheme: dark;
 }
 
 .finder__input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 4px rgba(138, 180, 255, 0.16);
+  border-color: var(--amber);
+  box-shadow: 0 0 0 1px var(--amber), 0 0 18px rgba(255, 179, 71, 0.18);
 }
 
+/* Primary button: a flat amber plate with an engraved label, no gradient. */
 .btn-find {
   position: relative;
   flex: 0 0 auto;
-  padding: 15px 26px;
-  font-size: 1rem;
+  padding: 16px 28px;
+  font-size: 0.82rem;
   font-weight: 600;
-  font-family: inherit;
-  color: #06122e;
-  border: none;
-  border-radius: 14px;
+  font-family: var(--mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-900);
+  border: 1px solid var(--amber);
+  border-radius: 3px;
   cursor: pointer;
-  background: linear-gradient(135deg, #ffe7bd, #8ab4ff);
-  box-shadow: 0 8px 30px rgba(138, 180, 255, 0.35),
-    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
-  transition: transform 0.2s var(--ease), box-shadow 0.25s, filter 0.2s;
+  background: var(--amber);
+  transition: transform 0.18s var(--ease), box-shadow 0.22s, background 0.2s;
   overflow: hidden;
 }
 
 .btn-find:hover {
   transform: translateY(-2px);
-  filter: brightness(1.05);
-  box-shadow: 0 14px 40px rgba(138, 180, 255, 0.5);
+  background: var(--amber-soft);
+  box-shadow: 0 10px 30px rgba(255, 179, 71, 0.28);
 }
 
 .btn-find:active {
@@ -334,7 +383,7 @@ body {
   inset: 0;
   background: radial-gradient(
     120px 60px at var(--x, 50%) 50%,
-    rgba(255, 255, 255, 0.6),
+    rgba(255, 255, 255, 0.55),
     transparent 70%
   );
   opacity: 0;
@@ -346,20 +395,23 @@ body {
 }
 
 .finder__hint {
-  margin: 16px auto 0;
-  max-width: 38ch;
+  margin: 18px 0 0;
+  max-width: 46ch;
   font-size: 0.85rem;
-  line-height: 1.5;
-  color: var(--ink-faint);
+  line-height: 1.55;
+  color: var(--text-faint);
 }
 
 .finder__error {
   margin: 12px 0 0;
-  color: #ffb4b4;
-  font-size: 0.9rem;
+  font-family: var(--mono);
+  color: #ff8f8f;
+  font-size: 0.85rem;
 }
 
-/* ---------- Result card -------------------------------------------------- */
+/* ---------- A reusable "chart plate" -------------------------------------
+   Hairline-bordered panel with reticle ticks at the corners. Used by the
+   result card, timeline, and starpost panels. */
 .result {
   width: 100%;
   max-width: var(--max);
@@ -367,15 +419,40 @@ body {
 
 .card {
   position: relative;
-  padding: 40px 30px 32px;
-  border-radius: 26px;
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  padding: 40px 32px 34px;
+  border-radius: 4px;
+  background: var(--plate);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
   overflow: hidden;
   animation: cardIn 0.9s var(--ease) both;
+}
+
+/* Corner reticle ticks (top-left + bottom-right) via the two pseudos. */
+.card::before,
+.card::after {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--amber);
+  pointer-events: none;
+}
+
+.card::before {
+  top: 12px;
+  left: 12px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.card::after {
+  bottom: 12px;
+  right: 12px;
+  border-left: none;
+  border-top: none;
 }
 
 .card__halo {
@@ -387,25 +464,26 @@ body {
   height: 320px;
   border-radius: 50%;
   background: radial-gradient(circle, var(--star-color, #fff), transparent 65%);
-  opacity: 0.22;
-  filter: blur(20px);
+  opacity: 0.18;
+  filter: blur(24px);
   pointer-events: none;
 }
 
 .card__kicker {
   margin: 0;
-  font-size: 0.78rem;
-  letter-spacing: 0.3em;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--ink-faint);
+  color: var(--text-faint);
 }
 
 .card__name {
-  font-family: "Fraunces", Georgia, serif;
-  font-weight: 400;
-  font-size: clamp(2.2rem, 9vw, 3.4rem);
-  margin: 8px 0 18px;
-  line-height: 1.05;
+  font-family: var(--serif);
+  font-weight: 300;
+  font-size: clamp(2.3rem, 9vw, 3.6rem);
+  margin: 10px 0 20px;
+  line-height: 1.02;
   color: #fff;
   text-shadow: 0 0 40px var(--star-color, rgba(255, 255, 255, 0.4));
 }
@@ -413,154 +491,176 @@ body {
 .card__dot-row {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 12px;
-  margin-bottom: 22px;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px dashed var(--line-soft);
 }
 
 .card__dot {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
+  flex: 0 0 auto;
   background: var(--star-color, #fff);
   box-shadow: 0 0 16px 3px var(--star-color, #fff);
   animation: pulse 2.6s ease-in-out infinite;
 }
 
 .card__meta {
-  font-size: 0.95rem;
-  color: var(--ink-soft);
-  letter-spacing: 0.01em;
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+  color: var(--text-soft);
 }
 
 .card__line {
-  margin: 0 auto 16px;
-  max-width: 34ch;
-  font-size: clamp(1.1rem, 3.6vw, 1.35rem);
-  line-height: 1.5;
-  color: var(--ink);
+  margin: 0 0 16px;
+  max-width: 40ch;
+  font-size: clamp(1.05rem, 3.4vw, 1.28rem);
+  line-height: 1.55;
+  color: var(--text);
   font-weight: 300;
 }
 
 .card__line strong {
   font-weight: 600;
-  color: var(--accent-warm);
+  color: var(--amber-soft);
 }
 
 .card__poem {
-  margin: 0 auto;
-  max-width: 32ch;
-  font-family: "Fraunces", Georgia, serif;
+  margin: 0;
+  max-width: 38ch;
+  font-family: var(--serif);
   font-style: italic;
-  font-size: 1.02rem;
-  line-height: 1.55;
-  color: var(--ink-soft);
+  font-weight: 400;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--text-soft);
 }
 
 .card__actions {
   margin-top: 30px;
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  justify-content: center;
+  gap: 10px;
 }
 
-.galaxy-active .card__actions {
-  justify-content: flex-start;
-}
-
+/* ---------- Secondary / ghost buttons ----------------------------------- */
 .btn-soft {
-  padding: 12px 22px;
-  font-size: 0.92rem;
+  padding: 12px 20px;
+  font-size: 0.76rem;
   font-weight: 600;
-  font-family: inherit;
-  color: #06122e;
-  background: linear-gradient(135deg, #ffe7bd, #8ab4ff);
-  border: none;
-  border-radius: 12px;
+  font-family: var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-900);
+  background: var(--amber);
+  border: 1px solid var(--amber);
+  border-radius: 3px;
   cursor: pointer;
-  box-shadow: 0 6px 22px rgba(138, 180, 255, 0.3);
-  transition: transform 0.2s var(--ease), box-shadow 0.25s, filter 0.2s;
+  transition: transform 0.18s var(--ease), background 0.2s, box-shadow 0.22s;
 }
 
 .btn-soft:hover {
   transform: translateY(-2px);
-  filter: brightness(1.05);
-  box-shadow: 0 10px 30px rgba(138, 180, 255, 0.45);
+  background: var(--amber-soft);
+  box-shadow: 0 8px 24px rgba(255, 179, 71, 0.26);
 }
 
 .btn-ghost {
-  padding: 12px 22px;
-  font-size: 0.92rem;
-  font-family: inherit;
-  color: var(--ink-soft);
+  padding: 12px 20px;
+  font-size: 0.76rem;
+  font-family: var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-soft);
   background: transparent;
-  border: 1px solid var(--card-border);
-  border-radius: 12px;
+  border: 1px solid var(--line-soft);
+  border-radius: 3px;
   cursor: pointer;
   transition: color 0.2s, border-color 0.2s, background 0.2s;
 }
 
 .btn-ghost:hover {
-  color: #fff;
-  border-color: var(--accent);
-  background: rgba(138, 180, 255, 0.08);
+  color: var(--text);
+  border-color: var(--amber);
+  background: rgba(255, 179, 71, 0.06);
 }
 
-/* ---------- Timeline — "The Universe Is Watching" (Phase 3) -------------- */
+/* ---------- Timeline — "The Universe Is Watching" ----------------------- */
 .timeline {
+  position: relative;
   width: 100%;
   max-width: var(--max);
-  margin-top: 18px;
-  padding: 22px 24px 24px;
-  border-radius: 22px;
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  margin-top: 16px;
+  padding: 24px 26px 26px;
+  border-radius: 4px;
+  background: var(--plate);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.5);
-  text-align: center;
+  text-align: left;
   animation: cardIn 0.7s var(--ease) both;
 }
 
+.timeline::before,
+.timeline::after {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--amber);
+  pointer-events: none;
+}
+.timeline::before {
+  top: 12px;
+  right: 12px;
+  border-left: none;
+  border-bottom: none;
+}
+.timeline::after {
+  bottom: 12px;
+  left: 12px;
+  border-right: none;
+  border-top: none;
+}
+
 .timeline__eyebrow {
-  margin: 0 0 8px;
-  font-size: 0.7rem;
-  letter-spacing: 0.3em;
+  margin: 0 0 10px;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--ink-faint);
+  color: var(--text-faint);
 }
 
 .timeline__headline {
-  margin: 0 0 20px;
-  font-size: clamp(1rem, 3.2vw, 1.18rem);
-  line-height: 1.5;
-  color: var(--ink);
+  margin: 0 0 22px;
+  font-size: clamp(1rem, 3.2vw, 1.2rem);
+  line-height: 1.55;
+  color: var(--text);
   font-weight: 300;
   min-height: 3.2em;
 }
 
 .timeline__headline strong {
   font-weight: 600;
-  color: var(--accent-warm);
+  color: var(--amber-soft);
 }
 
 .timeline__sliderwrap {
-  margin: 0 auto 18px;
-  max-width: 520px;
+  margin: 0 0 18px;
 }
 
 .timeline__slider {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
-  height: 6px;
-  border-radius: 999px;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 231, 189, 0.9),
-    rgba(138, 180, 255, 0.9)
-  );
+  height: 2px;
+  border-radius: 0;
+  background: linear-gradient(90deg, var(--amber), var(--cold));
   outline: none;
   cursor: pointer;
 }
@@ -568,40 +668,42 @@ body {
 .timeline__slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 22px;
-  height: 22px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
-  background: #fff;
-  border: 2px solid var(--accent-warm);
-  box-shadow: 0 0 14px 3px rgba(255, 217, 160, 0.7);
+  background: var(--ink-900);
+  border: 2px solid var(--amber);
+  box-shadow: 0 0 12px 2px rgba(255, 179, 71, 0.7);
   cursor: pointer;
   transition: transform 0.15s;
 }
 
 .timeline__slider::-webkit-slider-thumb:hover {
-  transform: scale(1.12);
+  transform: scale(1.15);
 }
 
 .timeline__slider::-moz-range-thumb {
-  width: 22px;
-  height: 22px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
-  background: #fff;
-  border: 2px solid var(--accent-warm);
-  box-shadow: 0 0 14px 3px rgba(255, 217, 160, 0.7);
+  background: var(--ink-900);
+  border: 2px solid var(--amber);
+  box-shadow: 0 0 12px 2px rgba(255, 179, 71, 0.7);
   cursor: pointer;
 }
 
 .timeline__slider:focus-visible {
-  box-shadow: 0 0 0 4px rgba(138, 180, 255, 0.25);
+  box-shadow: 0 0 0 3px rgba(255, 179, 71, 0.25);
 }
 
 .timeline__scale {
   display: flex;
   justify-content: space-between;
-  margin-top: 8px;
-  font-size: 0.7rem;
-  color: var(--ink-faint);
+  margin-top: 10px;
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.04em;
+  color: var(--text-faint);
 }
 
 .timeline__events {
@@ -611,45 +713,44 @@ body {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  justify-content: center;
 }
 
 .tl-chip {
   padding: 7px 12px;
-  font-size: 0.8rem;
-  font-family: inherit;
-  color: var(--ink-soft);
-  background: rgba(10, 14, 36, 0.6);
-  border: 1px solid var(--card-border);
-  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.02em;
+  color: var(--text-soft);
+  background: var(--ink-700);
+  border: 1px solid var(--line-soft);
+  border-radius: 2px;
   cursor: pointer;
   transition: color 0.2s, border-color 0.2s, background 0.2s, transform 0.15s;
 }
 
 .tl-chip:hover {
-  color: #fff;
-  border-color: var(--accent);
-  background: rgba(138, 180, 255, 0.12);
+  color: var(--text);
+  border-color: var(--amber);
+  background: rgba(255, 179, 71, 0.08);
   transform: translateY(-1px);
 }
 
 .tl-chip__emoji {
-  margin-right: 2px;
+  margin-right: 4px;
 }
 
 .tl-chip--you {
-  color: #06122e;
-  background: linear-gradient(135deg, #ffe7bd, #ffd9a0);
-  border-color: transparent;
+  color: var(--ink-900);
+  background: var(--amber);
+  border-color: var(--amber);
   font-weight: 600;
 }
 
 .tl-chip--you:hover {
-  color: #06122e;
-  background: linear-gradient(135deg, #fff0d6, #ffe2b4);
+  color: var(--ink-900);
+  background: var(--amber-soft);
 }
 
-/* When the timeline is open, keep it interactive above the canvas. */
 .timeline-active .timeline {
   pointer-events: auto;
 }
@@ -660,60 +761,78 @@ body {
   }
 }
 
-/* ---------- Starpost — pin a message + share card (Phase 4) ------------- */
+/* ---------- Starpost — pin a message + share card ----------------------- */
 .starpost {
   width: 100%;
   max-width: var(--max);
-  margin-top: 18px;
+  margin-top: 16px;
   animation: cardIn 0.7s var(--ease) both;
 }
 
 .starpost__composer,
 .starpost__output {
-  padding: 22px 24px 24px;
-  border-radius: 22px;
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  position: relative;
+  padding: 24px 26px 26px;
+  border-radius: 4px;
+  background: var(--plate);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.5);
+}
+
+.starpost__composer::before,
+.starpost__output::before {
+  content: "";
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--amber);
+  border-right: none;
+  border-bottom: none;
+  pointer-events: none;
 }
 
 .starpost__label {
   display: block;
-  margin-bottom: 12px;
-  font-size: 0.95rem;
-  color: var(--ink-soft);
+  margin-bottom: 14px;
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-soft);
 }
 
 .starpost__label span {
-  color: var(--accent-warm);
+  color: var(--amber-soft);
   font-weight: 600;
 }
 
 .starpost__textarea {
   width: 100%;
   resize: vertical;
-  min-height: 76px;
+  min-height: 80px;
   padding: 14px 16px;
-  font-family: inherit;
+  font-family: var(--sans);
   font-size: 1rem;
-  line-height: 1.5;
-  color: var(--ink);
-  background: rgba(8, 11, 28, 0.7);
-  border: 1px solid var(--card-border);
-  border-radius: 14px;
+  line-height: 1.55;
+  color: var(--text);
+  background: var(--ink-700);
+  border: 1px solid var(--line-soft);
+  border-radius: 3px;
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .starpost__textarea::placeholder {
-  color: var(--ink-faint);
+  color: var(--text-faint);
 }
 
 .starpost__textarea:focus-visible {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 4px rgba(138, 180, 255, 0.18);
+  border-color: var(--amber);
+  box-shadow: 0 0 0 1px var(--amber), 0 0 16px rgba(255, 179, 71, 0.16);
 }
 
 .starpost__composer-row {
@@ -725,8 +844,10 @@ body {
 }
 
 .starpost__count {
-  font-size: 0.78rem;
-  color: var(--ink-faint);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: var(--text-faint);
 }
 
 /* --- the share card we rasterise to PNG --- */
@@ -737,16 +858,27 @@ body {
 }
 
 .sharecard {
-  --star-color: #ffd9a0;
+  --star-color: var(--amber-soft);
   position: relative;
   width: 100%;
   max-width: 420px;
   aspect-ratio: 4 / 5;
-  border-radius: 22px;
+  border-radius: 6px;
   overflow: hidden;
   background:
-    radial-gradient(130% 80% at 50% -10%, #1a2657 0%, #0a0e24 45%, #05060f 100%);
+    radial-gradient(130% 80% at 50% -10%, #16203f 0%, #0a0e1f 45%, #05060c 100%);
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6);
+}
+
+/* A thin inner frame so the card reads like a printed plate. */
+.sharecard::before {
+  content: "";
+  position: absolute;
+  inset: 14px;
+  border: 1px solid rgba(255, 179, 71, 0.25);
+  border-radius: 3px;
+  pointer-events: none;
+  z-index: 2;
 }
 
 .sharecard__sky {
@@ -758,13 +890,12 @@ body {
     radial-gradient(1.5px 1.5px at 82% 64%, #ffffff, transparent),
     radial-gradient(1px 1px at 33% 78%, #bcd0ff, transparent),
     radial-gradient(1px 1px at 52% 44%, #ffffff, transparent),
-    radial-gradient(1.5px 1.5px at 12% 60%, #ffe7bd, transparent),
+    radial-gradient(1.5px 1.5px at 12% 60%, var(--amber-soft), transparent),
     radial-gradient(1px 1px at 90% 38%, #ffffff, transparent),
     radial-gradient(1px 1px at 60% 88%, #cdd7ff, transparent);
   opacity: 0.85;
 }
 
-/* The star itself: a soft glowing orb in the star's colour. */
 .sharecard__sky::after {
   content: "";
   position: absolute;
@@ -782,37 +913,40 @@ body {
 
 .sharecard__inner {
   position: relative;
+  z-index: 3;
   height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 28px 26px 26px;
-  text-align: center;
+  padding: 32px 30px 30px;
+  text-align: left;
 }
 
 .sharecard__brand {
   position: absolute;
-  top: 22px;
-  left: 0;
-  right: 0;
+  top: 26px;
+  left: 30px;
+  right: 30px;
   margin: 0;
-  font-size: 0.72rem;
-  letter-spacing: 0.42em;
-  color: var(--ink-soft);
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.36em;
+  color: var(--amber);
 }
 
 .sharecard__kicker {
   margin: 0 0 4px;
-  font-size: 0.74rem;
-  letter-spacing: 0.28em;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--ink-faint);
+  color: var(--text-faint);
 }
 
 .sharecard__name {
   margin: 0 0 8px;
-  font-family: "Fraunces", Georgia, serif;
-  font-weight: 400;
+  font-family: var(--serif);
+  font-weight: 300;
   font-size: clamp(1.9rem, 8vw, 2.6rem);
   line-height: 1.05;
   color: #fff;
@@ -820,48 +954,49 @@ body {
 
 .sharecard__meta {
   margin: 0 0 16px;
-  font-size: 0.86rem;
-  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  color: var(--amber-soft);
 }
 
 .sharecard__message {
   margin: 0 0 16px;
-  font-family: "Fraunces", Georgia, serif;
+  font-family: var(--serif);
   font-style: italic;
   font-size: clamp(1rem, 4.4vw, 1.2rem);
-  line-height: 1.45;
-  color: var(--ink);
+  line-height: 1.5;
+  color: var(--text);
 }
 
 .sharecard__foot {
   margin: 0;
   font-size: 0.74rem;
-  line-height: 1.4;
-  color: var(--ink-faint);
+  line-height: 1.45;
+  color: var(--text-faint);
 }
 
 .starpost__actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 10px;
   justify-content: center;
-  margin-top: 20px;
+  margin-top: 22px;
 }
 
 .btn-share {
-  font-family: inherit;
-  font-size: 0.86rem;
+  font-family: var(--mono);
+  font-size: 0.74rem;
   font-weight: 500;
-  padding: 10px 16px;
-  border-radius: 999px;
-  border: 1px solid var(--line);
-  background: var(--panel);
-  color: var(--ink);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 11px 16px;
+  border-radius: 3px;
+  border: 1px solid var(--line-soft);
+  background: var(--ink-700);
+  color: var(--text);
   cursor: pointer;
-  transition:
-    background 0.2s ease,
-    border-color 0.2s ease,
-    transform 0.15s ease;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
 }
 
 .btn-share:hover {
@@ -879,14 +1014,16 @@ body {
 }
 
 .btn-share:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--amber);
   outline-offset: 2px;
 }
 
 .starpost__hint {
-  margin: 14px 0 0;
-  font-size: 0.8rem;
-  color: var(--ink-faint);
+  margin: 16px 0 0;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  color: var(--text-faint);
   text-align: center;
 }
 
@@ -896,9 +1033,11 @@ body {
 
 /* ---------- Footer ------------------------------------------------------- */
 .footer {
-  margin-top: 44px;
-  font-size: 0.78rem;
-  color: var(--ink-faint);
+  margin-top: 48px;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: var(--text-faint);
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
@@ -907,51 +1046,32 @@ body {
 }
 
 .footer a {
-  color: var(--ink-soft);
+  color: var(--text-soft);
   text-decoration: none;
-  border-bottom: 1px dashed var(--ink-faint);
+  border-bottom: 1px solid var(--line);
 }
 
 .footer a:hover {
-  color: var(--accent);
+  color: var(--amber);
+  border-color: var(--amber);
 }
 
 /* ---------- Animations --------------------------------------------------- */
 @keyframes rise {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes cardIn {
-  from {
-    opacity: 0;
-    transform: translateY(28px) scale(0.97);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+  from { opacity: 0; transform: translateY(28px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 @keyframes pulse {
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 0.85;
-  }
-  50% {
-    transform: scale(1.25);
-    opacity: 1;
-  }
+  0%, 100% { transform: scale(1); opacity: 0.85; }
+  50% { transform: scale(1.25); opacity: 1; }
 }
 
-/* Smooth show/hide via [hidden] override for fade. */
 [hidden] {
   display: none !important;
 }
